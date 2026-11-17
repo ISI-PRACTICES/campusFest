@@ -2,22 +2,40 @@ package co.edu.unillanos.campusfest.application.usecase;
 
 import java.time.LocalDateTime;
 
-import co.edu.unillanos.campusfest.domain.Evento;
 import co.edu.unillanos.campusfest.application.port.Reloj;
 import co.edu.unillanos.campusfest.application.port.RepositorioEventos;
+import co.edu.unillanos.campusfest.domain.Evento;
 
-/** ESQUELETO (Integrante 2). Reemplazar cada cuerpo por la implementación. */
+/** CU3 · Editar evento. */
 public class EditarEvento {
 
+    private final RepositorioEventos repositorio;
+    private final Reloj reloj;
+
     public EditarEvento(RepositorioEventos repositorio, Reloj reloj) {
+        this.repositorio = repositorio;
+        this.reloj = reloj;
     }
 
+    /** Devuelve el evento para llenar el formulario. */
     public Evento obtener(String eventoId) {
-        throw new UnsupportedOperationException("Pendiente: Integrante 2");
+        return buscarEvento(eventoId);
     }
 
     public void editar(String eventoId, String nombre, LocalDateTime fecha,
                        String lugar, int nuevoAforo) {
-        throw new UnsupportedOperationException("Pendiente: Integrante 2");
+        Evento evento = buscarEvento(eventoId);
+        // Primero el aforo: si la regla lo rechaza, el evento queda sin cambios.
+        evento.cambiarAforo(nuevoAforo, reloj.ahora());
+        evento.cambiarDatos(nombre, fecha, lugar);
+        repositorio.guardar(evento);
+    }
+
+    private Evento buscarEvento(String eventoId) {
+        Evento evento = repositorio.buscar(eventoId);
+        if (evento == null) {
+            throw new IllegalArgumentException("No existe el evento «" + eventoId + "».");
+        }
+        return evento;
     }
 }

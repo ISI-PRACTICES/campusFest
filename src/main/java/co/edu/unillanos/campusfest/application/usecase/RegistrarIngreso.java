@@ -1,16 +1,38 @@
 package co.edu.unillanos.campusfest.application.usecase;
 
-import co.edu.unillanos.campusfest.domain.Asistencia;
 import co.edu.unillanos.campusfest.application.port.Reloj;
 import co.edu.unillanos.campusfest.application.port.RepositorioEventos;
+import co.edu.unillanos.campusfest.domain.Asistencia;
+import co.edu.unillanos.campusfest.domain.Evento;
+import co.edu.unillanos.campusfest.domain.Reserva;
 
-/** ESQUELETO (Integrante 2). Reemplazar cada cuerpo por la implementación. */
+/**
+ * CU4 · Registrar el ingreso con QR. El código llega como texto: el lector de QR
+ * es un detalle que este caso de uso no conoce.
+ */
 public class RegistrarIngreso {
 
+    private final RepositorioEventos repositorio;
+    private final Reloj reloj;
+
     public RegistrarIngreso(RepositorioEventos repositorio, Reloj reloj) {
+        this.repositorio = repositorio;
+        this.reloj = reloj;
     }
 
     public Asistencia registrar(String eventoId, String codigo) {
-        throw new UnsupportedOperationException("Pendiente: Integrante 2");
+        Evento evento = buscarEvento(eventoId);
+        Reserva reserva = evento.buscarReservaPorCodigo(codigo);
+        Asistencia asistencia = reserva.registrarIngreso(reloj.ahora());
+        repositorio.guardar(evento);
+        return asistencia;
+    }
+
+    private Evento buscarEvento(String eventoId) {
+        Evento evento = repositorio.buscar(eventoId);
+        if (evento == null) {
+            throw new IllegalArgumentException("No existe el evento «" + eventoId + "».");
+        }
+        return evento;
     }
 }
