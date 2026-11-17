@@ -1,6 +1,9 @@
 package co.edu.unillanos.campusfest;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import co.edu.unillanos.campusfest.application.port.Reloj;
@@ -10,7 +13,7 @@ import co.edu.unillanos.campusfest.application.usecase.EditarEvento;
 import co.edu.unillanos.campusfest.application.usecase.RegistrarIngreso;
 import co.edu.unillanos.campusfest.application.usecase.ReservarEntrada;
 import co.edu.unillanos.campusfest.domain.Evento;
-import co.edu.unillanos.campusfest.infrastructure.persistence.RepositorioEventosEnMemoria;
+import co.edu.unillanos.campusfest.infrastructure.persistence.RepositorioEventosH2;
 import co.edu.unillanos.campusfest.infrastructure.reloj.RelojDelSistema;
 import co.edu.unillanos.campusfest.infrastructure.ui.PantallaCuposController;
 import co.edu.unillanos.campusfest.infrastructure.ui.PantallaEventoController;
@@ -33,10 +36,15 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
+    private static final String URL_BASE_DE_DATOS = "jdbc:h2:./data/campusfest";
+
+    private Connection conexion;
+
     @Override
     public void start(Stage ventana) {
         try {
-            RepositorioEventos repositorio = new RepositorioEventosEnMemoria();
+            conexion = DriverManager.getConnection(URL_BASE_DE_DATOS, "sa", "");
+            RepositorioEventos repositorio = new RepositorioEventosH2(conexion);
             Reloj reloj = new RelojDelSistema();
             cargarEventosDeDemostracion(repositorio);
 
@@ -55,8 +63,20 @@ public class App extends Application {
             ventana.setTitle("CampusFest");
             ventana.setScene(escena);
             ventana.show();
-        } catch (IOException | IllegalStateException e) {
+        } catch (SQLException | IOException | IllegalStateException e) {
             mostrarErrorDeArranque(e);
+        }
+    }
+
+    @Override
+    public void stop() {
+        if (conexion == null) {
+            return;
+        }
+        try {
+            conexion.close();
+        } catch (SQLException e) {
+            System.err.println("No se pudo cerrar la base de datos: " + e.getMessage());
         }
     }
 
@@ -69,7 +89,7 @@ public class App extends Application {
         return pestana;
     }
 
-    /** Ningún caso de uso crea eventos: si no hay datos, se dejan dos para probar. */
+    /** Ningún caso de uso crea eventos: si la base está vacía, se dejan dos para probar. */
     private void cargarEventosDeDemostracion(RepositorioEventos repositorio) {
         if (repositorio.buscar("concierto") == null) {
             repositorio.guardar(new Evento("concierto", "Concierto de bienvenida",
@@ -85,7 +105,8 @@ public class App extends Application {
         Alert alerta = new Alert(Alert.AlertType.ERROR);
         alerta.setTitle("CampusFest");
         alerta.setHeaderText("La aplicación no pudo iniciar");
-        alerta.setContentText(error.getMessage());
+        alerta.setContentText(error.getMessage()
+                + "\n\n¿Hay otra ventana de CampusFest abierta? H2 solo permite una a la vez.");
         alerta.showAndWait();
         Platform.exit();
     }
