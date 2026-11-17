@@ -1,16 +1,30 @@
 package co.edu.unillanos.campusfest.application.usecase;
 
-
 import co.edu.unillanos.campusfest.application.port.Reloj;
 import co.edu.unillanos.campusfest.application.port.RepositorioEventos;
+import co.edu.unillanos.campusfest.domain.Evento;
 
-/** ESQUELETO (Integrante 2). Reemplazar cada cuerpo por la implementación. */
+/** CU1 · Consultar cupos. Solo coordina: busca el evento, pide la hora y delega. */
 public class ConsultarCupos {
 
+    private final RepositorioEventos repositorio;
+    private final Reloj reloj;
+
     public ConsultarCupos(RepositorioEventos repositorio, Reloj reloj) {
+        this.repositorio = repositorio;
+        this.reloj = reloj;
     }
 
     public int consultar(String eventoId) {
-        throw new UnsupportedOperationException("Pendiente: Integrante 2");
+        Evento evento = buscarEvento(eventoId);
+        return evento.cuposDisponibles(reloj.ahora());
+    }
+
+    private Evento buscarEvento(String eventoId) {
+        Evento evento = repositorio.buscar(eventoId);
+        if (evento == null) {
+            throw new IllegalArgumentException("No existe el evento «" + eventoId + "».");
+        }
+        return evento;
     }
 }

@@ -1,21 +1,27 @@
 package co.edu.unillanos.campusfest.infrastructure.persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import co.edu.unillanos.campusfest.application.port.RepositorioEventos;
 import co.edu.unillanos.campusfest.domain.Evento;
 
-/** ESQUELETO (Integrante 2). */
+/** Adaptador del puerto RepositorioEventos que guarda los eventos en un mapa. */
 public class RepositorioEventosEnMemoria implements RepositorioEventos {
 
+    private final Map<String, Evento> eventos;
+
     public RepositorioEventosEnMemoria() {
+        this.eventos = new HashMap<>();
     }
 
     @Override
     public Evento buscar(String eventoId) {
-        throw new UnsupportedOperationException("Pendiente: Integrante 2");
+        return eventos.get(eventoId);
     }
 
     @Override
     public void guardar(Evento evento) {
-        throw new UnsupportedOperationException("Pendiente: Integrante 2");
+        eventos.put(evento.getId(), evento);
     }
 }
