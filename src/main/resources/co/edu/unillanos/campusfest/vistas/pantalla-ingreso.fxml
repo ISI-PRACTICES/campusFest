@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!-- CU4 · Registrar el ingreso con QR. Sin fx:controller: App asigna PantallaIngresoController.
+     Un lector de QR tipo teclado escribe el código en el campo y envía Enter. -->
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      styleClass="pantalla" spacing="14">
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+    <Label text="Registrar ingreso" styleClass="titulo"/>
+    <Label text="Escanee o escriba el código QR de la reserva confirmada."
+           styleClass="ayuda" wrapText="true"/>
+    <GridPane hgap="10" vgap="10">
+        <Label text="Evento" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="campoEventoId" promptText="ej.: concierto"
+                   GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        <Label text="Código QR" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="campoCodigo" promptText="Código de la reserva" prefColumnCount="30"
+                   onAction="#alRegistrar" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <Button text="Registrar ingreso" onAction="#alRegistrar"
+                GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+    </GridPane>
+    <Label fx:id="etiquetaMensaje" styleClass="mensaje" wrapText="true"/>
+</VBox>
